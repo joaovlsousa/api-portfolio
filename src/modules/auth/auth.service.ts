@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -49,5 +50,32 @@ export class AuthService {
     }
 
     return accessToken;
+  }
+
+  async getCurrentUser(authorization: string | undefined) {
+    if (!authorization) {
+      throw new UnauthorizedException();
+    }
+
+    const [type, accessToken] = authorization.split(' ');
+
+    if (type !== 'Bearer') {
+      throw new BadRequestException();
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { accessToken },
+      select: {
+        id: true,
+        accessToken: true,
+        email: true,
+      },
+    });
+
+    if (!user || user.accessToken !== accessToken) {
+      throw new UnauthorizedException();
+    }
+
+    return user;
   }
 }

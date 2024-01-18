@@ -10,11 +10,11 @@ import { AuthDTO } from './auth.dto';
 import { authModel } from './auth.model';
 import { AuthService } from './auth.service';
 
-@Controller()
+@Controller('login')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('/login')
+  @Post()
   async login(@Body() body: AuthDTO, @Res() res: Response) {
     try {
       const req = authModel.safeParse(body);
