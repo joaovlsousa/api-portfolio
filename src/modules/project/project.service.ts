@@ -38,4 +38,29 @@ export class ProjectService {
       },
     });
   }
+
+  async getProjects(userId: string) {
+    const { projects } = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        projects: {
+          select: {
+            deployUrl: true,
+            description: true,
+            githubUrl: true,
+            imageUrl: true,
+            pinned: true,
+            title: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+      },
+    });
+
+    return projects;
+  }
 }

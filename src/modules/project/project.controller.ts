@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Headers,
   Post,
 } from '@nestjs/common';
@@ -36,6 +37,21 @@ export class ProjectController {
       );
 
       return { projectId };
+    } catch (error) {
+      return { error };
+    }
+  }
+
+  @Get()
+  async getProjects(
+    @Headers('Authorization') authorization: string | undefined,
+  ) {
+    try {
+      const user = await this.authService.getCurrentUser(authorization);
+
+      const projects = await this.projectService.getProjects(user.id);
+
+      return { projects };
     } catch (error) {
       return { error };
     }
