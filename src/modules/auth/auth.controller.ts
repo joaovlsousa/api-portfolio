@@ -27,7 +27,10 @@ export class AuthController {
 
       return res.status(200).json({ accessToken }).send();
     } catch (error) {
-      return { error };
+      return res
+        .status(error.status ?? 500)
+        .json({ message: error.response?.message })
+        .send();
     }
   }
 }

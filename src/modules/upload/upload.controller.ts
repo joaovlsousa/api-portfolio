@@ -3,10 +3,12 @@ import {
   Headers,
   Param,
   Post,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 import { AuthService } from '../auth/auth.service';
 import { FileDTO } from './upload.dto';
 import { UploadService } from './upload.service';
@@ -24,13 +26,19 @@ export class UploadController {
     @UploadedFile() file: FileDTO,
     @Headers('Authorization') authorization: string | undefined,
     @Param() projectId: { id: string },
+    @Res() res: Response,
   ) {
     try {
       const user = await this.authService.getCurrentUser(authorization);
 
       await this.uploadService.uploadFile(file, user.id, projectId.id);
+
+      return res.status(201).send();
     } catch (error) {
-      return { error };
+      return res
+        .status(error.status ?? 500)
+        .json({ error })
+        .send();
     }
   }
 }

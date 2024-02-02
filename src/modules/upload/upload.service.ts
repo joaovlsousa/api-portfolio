@@ -31,7 +31,6 @@ export class UploadService {
     const {
       data: { publicUrl },
     } = supabase.storage.from('projects').getPublicUrl(data.path);
-
     await this.projectService.setImage(userId, projectId, publicUrl);
   }
 }

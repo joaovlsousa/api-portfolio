@@ -25,9 +25,9 @@ model Project {
   title       String
   description String
   pinned      Boolean  @default(false)
-  githubUrl   String   @unique @map("github_url")
-  deployUrl   String?  @unique @map("deploy_url")
-  imageUrl    String?  @unique @map("image_url")
+  githubUrl   String   @map("github_url")
+  deployUrl   String?  @map("deploy_url")
+  imageUrl    String?  @map("image_url")
   createdAt   DateTime @default(now())
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)

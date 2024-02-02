@@ -5,7 +5,9 @@ import {
   Get,
   Headers,
   Post,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from '../auth/auth.service';
 import { ProjectDTO } from './project.dto';
 import { projectModel } from './project.model';
@@ -22,6 +24,7 @@ export class ProjectController {
   async createProject(
     @Headers('Authorization') authorization: string | undefined,
     @Body() body: ProjectDTO,
+    @Res() res: Response,
   ) {
     try {
       const user = await this.authService.getCurrentUser(authorization);
@@ -36,24 +39,50 @@ export class ProjectController {
         user.id,
       );
 
-      return { projectId };
+      return res.status(201).json({ projectId }).send();
     } catch (error) {
-      return { error };
+      return res
+        .status(error.status ?? 500)
+        .json({ message: error.response?.message })
+        .send();
     }
   }
 
   @Get()
   async getProjects(
     @Headers('Authorization') authorization: string | undefined,
+    @Res() res: Response,
   ) {
     try {
       const user = await this.authService.getCurrentUser(authorization);
 
       const projects = await this.projectService.getProjects(user.id);
 
-      return { projects };
+      return res.status(200).json({ projects }).send();
     } catch (error) {
-      return { error };
+      return res
+        .status(error.status ?? 500)
+        .json({ message: error.response?.message })
+        .send();
+    }
+  }
+
+  @Get('/pinned')
+  async getPinnedProjects(
+    @Headers('Authorization') authorization: string | undefined,
+    @Res() res: Response,
+  ) {
+    try {
+      const user = await this.authService.getCurrentUser(authorization);
+
+      const projects = await this.projectService.getPinnedProjects(user.id);
+
+      return res.status(200).json({ projects }).send();
+    } catch (error) {
+      return res
+        .status(error.status ?? 500)
+        .json({ message: error.response?.message })
+        .send();
     }
   }
 }
