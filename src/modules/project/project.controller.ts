@@ -1,16 +1,7 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Get,
-  Headers,
-  Post,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from '../auth/auth.service';
 import { ProjectDTO } from './project.dto';
-import { projectModel } from './project.model';
 import { ProjectService } from './project.service';
 
 @Controller('project')
@@ -28,22 +19,14 @@ export class ProjectController {
   ) {
     try {
       const user = await this.authService.getCurrentUser(authorization);
-      const payload = projectModel.safeParse(body);
 
-      if (!payload.success) {
-        throw new BadRequestException();
-      }
-
-      const projectId = await this.projectService.createProject(
-        payload.data,
-        user.id,
-      );
+      const projectId = await this.projectService.createProject(body, user.id);
 
       return res.status(201).json({ projectId }).send();
     } catch (error) {
       return res
         .status(error.status ?? 500)
-        .json({ message: error.response?.message })
+        .json({ error })
         .send();
     }
   }
