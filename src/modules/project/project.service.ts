@@ -9,13 +9,15 @@ export class ProjectService {
   async createProject(projectData: ProjectDTO, userId: string) {
     const { deployUrl, description, githubUrl, pinned, title } = projectData;
 
+    const appUrl = deployUrl === '$undefined' ? null : deployUrl;
+
     const { id } = await this.prisma.project.create({
       data: {
         description,
         githubUrl,
         pinned,
         title,
-        deployUrl,
+        deployUrl: appUrl,
         user: {
           connect: {
             id: userId,
