@@ -1,13 +1,7 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Post,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, HttpException, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
+
 import { AuthDTO } from './auth.dto';
-import { authModel } from './auth.model';
 import { AuthService } from './auth.service';
 
 @Controller('login')
@@ -17,19 +11,19 @@ export class AuthController {
   @Post()
   async login(@Body() body: AuthDTO, @Res() res: Response) {
     try {
-      const req = authModel.safeParse(body);
-
-      if (!req.success) {
-        throw new BadRequestException();
-      }
-
-      const accessToken = await this.authService.login(req.data);
+      const accessToken = await this.authService.login(body);
 
       return res.status(200).json({ accessToken }).send();
     } catch (error) {
+      if (error instanceof HttpException) {
+        return res
+          .status(error.getStatus())
+          .json({ message: error.message })
+          .send();
+      }
       return res
-        .status(error.status ?? 500)
-        .json({ message: error.response?.message })
+        .status(500)
+        .json({ message: 'Erro interno do servidor' })
         .send();
     }
   }

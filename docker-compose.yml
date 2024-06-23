@@ -8,9 +8,9 @@ services:
     environment:
       - POSTGRES_USER=docker
       - POSTGRES_PASSWORD=docker
-      - POSTGRES_DB=joaov_api
+      - POSTGRES_DB=api-portfolio
     volumes:
-      - postgres_data:/bitnami/postgresql
+      - portfolio_pg_data:/bitnami/postgresql
 
 volumes:
-  postgres_data:
+  portfolio_pg_data:

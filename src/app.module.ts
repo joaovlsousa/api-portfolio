@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+
+import { JwtMiddleware } from './jwt.middleware';
 import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
-import { UploadModule } from './modules/upload/upload.module';
+import { ProjectModule } from './modules/projects/project.module';
 import { SupabaseModule } from './modules/supabase/supabase.module';
-import { ProjectModule } from './modules/project/project.module';
+import { UploadModule } from './modules/upload/upload.module';
 
 @Module({
   imports: [
@@ -18,4 +20,13 @@ import { ProjectModule } from './modules/project/project.module';
     ProjectModule,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(JwtMiddleware)
+      .forRoutes(
+        { path: 'projects', method: RequestMethod.ALL },
+        { path: 'projects/*', method: RequestMethod.ALL },
+      );
+  }
+}

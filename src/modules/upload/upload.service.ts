@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ProjectService } from '../project/project.service';
+
+import { ProjectService } from '../projects/project.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { FileDTO } from './upload.dto';
 

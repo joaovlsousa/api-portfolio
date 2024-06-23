@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import { PrismaService } from '../prisma/prisma.service';
 import { ProjectDTO } from './project.dto';
 
@@ -7,17 +8,9 @@ export class ProjectService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createProject(projectData: ProjectDTO, userId: string) {
-    const { deployUrl, description, githubUrl, pinned, title } = projectData;
-
-    const appUrl = deployUrl === '$undefined' ? null : deployUrl;
-
     const { id } = await this.prisma.project.create({
       data: {
-        description,
-        githubUrl,
-        pinned,
-        title,
-        deployUrl: appUrl,
+        ...projectData,
         user: {
           connect: {
             id: userId,
@@ -41,7 +34,7 @@ export class ProjectService {
     });
   }
 
-  async getProjects(userId: string) {
+  async getAll(userId: string) {
     const { projects } = await this.prisma.user.findUnique({
       where: {
         id: userId,
@@ -50,12 +43,12 @@ export class ProjectService {
         projects: {
           select: {
             id: true,
-            deployUrl: true,
+            title: true,
             description: true,
+            type: true,
             githubUrl: true,
             imageUrl: true,
-            pinned: true,
-            title: true,
+            deployUrl: true,
           },
           orderBy: {
             createdAt: 'desc',
@@ -67,7 +60,7 @@ export class ProjectService {
     return projects;
   }
 
-  async getPinnedProjects(userId: string) {
+  async getPinned(userId: string) {
     const { projects } = await this.prisma.user.findUnique({
       where: {
         id: userId,
@@ -77,12 +70,12 @@ export class ProjectService {
           where: { pinned: true },
           select: {
             id: true,
-            deployUrl: true,
+            title: true,
             description: true,
+            type: true,
             githubUrl: true,
             imageUrl: true,
-            pinned: true,
-            title: true,
+            deployUrl: true,
           },
           orderBy: {
             createdAt: 'desc',
