@@ -1,35 +1,29 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { FileDTO } from '../upload/upload.dto';
+import { UploadService } from '../upload/upload.service';
 import { ProjectDTO } from './project.dto';
 
 @Injectable()
 export class ProjectService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly uploadService: UploadService,
+  ) {}
 
-  async createProject(projectData: ProjectDTO, userId: string) {
-    const { id } = await this.prisma.project.create({
+  async createProject(file: FileDTO, projectData: ProjectDTO, userId: string) {
+    const imageUrl = await this.uploadService.uploadFile(file);
+
+    await this.prisma.project.create({
       data: {
         ...projectData,
+        imageUrl,
         user: {
           connect: {
             id: userId,
           },
         },
-      },
-    });
-
-    return id;
-  }
-
-  async setImage(userId: string, projectId: string, imageUrl: string) {
-    await this.prisma.project.update({
-      where: {
-        id: projectId,
-        userId,
-      },
-      data: {
-        imageUrl,
       },
     });
   }
