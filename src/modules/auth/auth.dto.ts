@@ -1,4 +1,10 @@
-import { z } from 'zod';
-import { authModel } from './auth.model';
+import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 
-export type AuthDTO = z.infer<typeof authModel>;
+export class AuthDTO {
+  @IsNotEmpty({ message: 'E-mail inválido' })
+  @IsEmail()
+  email: string;
+
+  @MinLength(6, { message: 'Min. 6 caracteres' })
+  password: string;
+}

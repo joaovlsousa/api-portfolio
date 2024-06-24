@@ -7,6 +7,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { v4 as uuid } from 'uuid';
+
 import { AuthDTO } from './auth.dto';
 
 @Injectable()
@@ -19,7 +20,7 @@ export class AuthService {
     });
 
     if (!existsUser) {
-      throw new NotFoundException();
+      throw new NotFoundException('Usuário ou senha inválido');
     }
 
     const passwordMatch = await bcrypt.compare(
@@ -28,7 +29,7 @@ export class AuthService {
     );
 
     if (!passwordMatch) {
-      throw new BadRequestException();
+      throw new BadRequestException('Usuário ou senha inválido');
     }
 
     let accessToken = existsUser.accessToken;
@@ -52,17 +53,7 @@ export class AuthService {
     return accessToken;
   }
 
-  async getCurrentUser(authorization: string | undefined) {
-    if (!authorization) {
-      throw new UnauthorizedException();
-    }
-
-    const [type, accessToken] = authorization.split(' ');
-
-    if (type !== 'Bearer') {
-      throw new BadRequestException();
-    }
-
+  async getCurrentUser(accessToken: string) {
     const user = await this.prisma.user.findUnique({
       where: { accessToken },
       select: {
@@ -73,7 +64,7 @@ export class AuthService {
     });
 
     if (!user || user.accessToken !== accessToken) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Não autorizado');
     }
 
     return user;
