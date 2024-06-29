@@ -18,9 +18,6 @@ export class ProjectDTO {
   githubUrl: string;
 
   @IsUrl({}, { message: 'Url inválida' })
-  imageUrl: string;
-
-  @IsUrl({}, { message: 'Url inválida' })
   @IsOptional()
   deployUrl: string | undefined;
 
