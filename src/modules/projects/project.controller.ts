@@ -39,7 +39,7 @@ export class ProjectController {
 
       const errors = await validate(projectDTO);
       if (errors.length > 0) {
-        throw new HttpException(errors, 400);
+        throw new HttpException('Dados inválidos', 400);
       }
 
       const user = await this.authService.getCurrentUser(req['token']);
